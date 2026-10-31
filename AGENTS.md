@@ -113,7 +113,11 @@ Work in this order. Do not skip ahead:
    - `models.py`: `VehicleType`, `SpotType`, `Vehicle`, `ParkingSpot`, `Ticket`
    - `lot.py`: `ParkingLot` with `add_spot`, `park`, `unpark`, flat $5 fee
    - `tests/test_lot.py`: happy path, lot full, unknown ticket, double unpark — all green
-2. Refactor pricing into the Strategy pattern.
+2. [DONE] Refactor pricing into the Strategy pattern. Tests pass.
+   - `pricing.py`: `PricingStrategy` ABC, `FlatRatePricing`, `HourlyPricing`, `PeakHourPricing`
+   - `lot.py`: `ParkingLot` accepts `pricing_strategy` in constructor, delegates fee calculation to strategy
+   - `tests/test_pricing.py`: flat rate, hourly rounding up, peak/off-peak rates — all with fixed timestamps
+   - `tests/test_lot.py`: updated to pass pricing strategy to `ParkingLot`
 3. Refactor spot behavior into the State pattern.
 4. Add the Factory for vehicle and spot creation.
 5. Add the availability query and the demo in `main.py`.
@@ -155,5 +159,8 @@ Record the decision here when made. Until then, the agent should ask before assu
 - Spot id prefix: `S` + number (e.g., `S1`, `S2`). Ticket id prefix: `T` + number.
 
 ### Still open
-- Fee rounding rule (round up to the next hour or charge per minute) — needed for step 2 pricing strategies.
-- Peak-hour window definition for the peak pricing strategy — needed for step 2.
+(None — all step 2 decisions recorded above.)
+
+### Decided in step 2
+- Fee rounding rule: round up to the next hour using `math.ceil`.
+- Peak-hour window: 18:00–22:00 (entry time determines peak vs base rate).
