@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Dict
 import math
 
-from parking_lot.pricing import PricingStrategy,FlatRatePricing
+from parking_lot.pricing import PricingStrategy,FlatRatePricing,PeakHourPricing,HourlyPricing
 from .errors import LotFullError, TicketNotFoundError
 from .models import ParkingSpot, SpotType, Ticket, Vehicle, VehicleType
 
