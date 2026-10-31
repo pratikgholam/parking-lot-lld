@@ -1,21 +1,28 @@
 from __future__ import annotations
 from datetime import datetime
 from typing import Dict
+import math
 
+from parking_lot.pricing import PricingStrategy,FlatRatePricing
 from .errors import LotFullError, TicketNotFoundError
 from .models import ParkingSpot, SpotType, Ticket, Vehicle, VehicleType
 
 class ParkingLot:
-    def __init__(self) -> None:
+    def __init__(self, pricing_strategy: PricingStrategy | None = None) -> None:
         self._spots: Dict[str, ParkingSpot] = {}
         self._tickets: Dict[str, Ticket] = {}
         self._next_ticket_id = 1
         self._next_spot_id = 1
+        self._pricing_strategy = pricing_strategy or FlatRatePricing()
+    
+    
     
     def add_spot(self, spot_type:SpotType) -> None:
         spot_id = f"S{self._next_spot_id}"
         self._next_spot_id+=1
         self._spots[spot_id]=ParkingSpot(id=spot_id,spot_type=spot_type)
+        
+        
         
     def park(self, vehicle: Vehicle) -> Ticket:
         spot = self._find_free_spot(vehicle.vehicle_type)
@@ -32,6 +39,7 @@ class ParkingLot:
         )
         self._tickets[ticket_id]=ticket
         return ticket
+     
         
     def unpark(self, ticket_id:str)->float:
         ticket=self._tickets.get(ticket_id)
@@ -41,14 +49,18 @@ class ParkingLot:
             raise TicketNotFoundError(f"Ticket {ticket_id} already exited")
         spot = self._spots[ticket.spot_id]
         spot.is_free=True
-        ticket.exit_time=datetime.now()
-        return 5.0
+        ticket.exit_time = datetime.now()
+        return self._pricing_strategy.calculate_fee(ticket.entry_time, ticket.exit_time)
+    
+    
     
     def _find_free_spot(self, vehicle_type: VehicleType) -> ParkingSpot | None:
         for spot in self._spots.values():
             if spot.is_free and self._fits(vehicle_type, spot.spot_type):
                 return spot
         return None
+    
+    
     
     @staticmethod
     def _fits(vehicle_type: VehicleType, spot_type:SpotType)->bool:
