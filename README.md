@@ -1,4 +1,4 @@
-# parking-lot-lld
+# Parking Lot (Low Level Design)
 
 A small, framework-free Python library that models a parking lot. It demonstrates three classic design patterns — Strategy, Factory, and State — in about 200 lines of code so a reviewer can read it in minutes.
 
