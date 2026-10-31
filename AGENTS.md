@@ -108,7 +108,11 @@ Do not add a pattern that has no clear job. Every pattern in the code must map t
 
 ### Workflow rules
 Work in this order. Do not skip ahead:
-1. Domain models and basic park/unpark with a simple inline price (no patterns yet). Get tests passing.
+1. [DONE] Domain models and basic park/unpark with a simple inline price (no patterns yet). Tests pass.
+   - `errors.py`: `ParkingError`, `LotFullError`, `TicketNotFoundError`, `SpotOutOfServiceError`
+   - `models.py`: `VehicleType`, `SpotType`, `Vehicle`, `ParkingSpot`, `Ticket`
+   - `lot.py`: `ParkingLot` with `add_spot`, `park`, `unpark`, flat $5 fee
+   - `tests/test_lot.py`: happy path, lot full, unknown ticket, double unpark — all green
 2. Refactor pricing into the Strategy pattern.
 3. Refactor spot behavior into the State pattern.
 4. Add the Factory for vehicle and spot creation.
@@ -144,7 +148,12 @@ The project is done when all of the following are true:
 
 Record the decision here when made. Until then, the agent should ask before assuming.
 
-- Exact nearest-spot rule (lowest spot id, or closest to entrance with an entrance position)
-- Fee rounding rule (round up to the next hour or charge per minute)
-- Whether out-of-service spots can be set through a public method or only in tests
-- Peak-hour window definition for the peak pricing strategy
+### Decided in this session
+- Nearest-spot rule: lowest free spot id that fits the vehicle type.
+- Fee (step 1): flat $5.0 placeholder; replaced by Strategy pattern in step 2.
+- Out-of-service spots: settable only in tests (no public method yet).
+- Spot id prefix: `S` + number (e.g., `S1`, `S2`). Ticket id prefix: `T` + number.
+
+### Still open
+- Fee rounding rule (round up to the next hour or charge per minute) — needed for step 2 pricing strategies.
+- Peak-hour window definition for the peak pricing strategy — needed for step 2.
