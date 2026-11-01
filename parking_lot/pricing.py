@@ -2,7 +2,6 @@ from datetime import datetime
 from abc import ABC, abstractmethod
 import math
 
-from .errors import LotFullError, TicketNotFoundError
 from .models import ParkingSpot, SpotType, Ticket, Vehicle, VehicleType
 
 
