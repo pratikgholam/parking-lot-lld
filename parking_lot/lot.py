@@ -5,7 +5,7 @@ import math
 from typing import Callable
 
 from parking_lot.pricing import PricingStrategy,FlatRatePricing,PeakHourPricing,HourlyPricing
-from .errors import LotFullError, TicketNotFoundError
+from .errors import LotFullError, TicketNotFoundError, SpotOutOfServiceError
 from .models import ParkingSpot, SpotType, Ticket, Vehicle, VehicleType
 from .states import FreeState,SpotState,OccupiedState
 
@@ -32,6 +32,9 @@ class ParkingLot:
         spot = self._find_free_spot(vehicle.vehicle_type)
         if spot is None:
             raise LotFullError(f"No Free Spot for {vehicle.vehicle_type.value}")
+        if not spot.state.can_park():
+            raise SpotOutOfServiceError(f"Cannot Park in this spot")
+             
         spot.state = OccupiedState()
         ticket_id = f"T{self._next_ticket_id}"
         self._next_ticket_id+=1
@@ -52,6 +55,9 @@ class ParkingLot:
         if ticket.exit_time is not None:
             raise TicketNotFoundError(f"Ticket {ticket_id} already exited")
         spot = self._spots[ticket.spot_id]
+        if not spot.state.can_unpark():
+            raise SpotOutOfServiceError(f"Cannot unpark from this spot")
+
         spot.state = FreeState()
         ticket.exit_time = self._clock()
         return self._pricing_strategy.calculate_fee(ticket.entry_time, ticket.exit_time)
