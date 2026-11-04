@@ -85,3 +85,10 @@ class ParkingLot:
             SpotType.LARGE: 3,
         }
         return spot_order[spot_type] >= vehicle_order[vehicle_type]
+    
+    def free_spot_counts(self) -> dict[SpotType, int]:
+        counts = {spot_type: 0 for spot_type in SpotType}
+        for spot in self._spots.values():
+            if spot.state.can_park():
+                counts[spot.spot_type] += 1
+        return counts
