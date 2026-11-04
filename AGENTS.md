@@ -118,10 +118,17 @@ Work in this order. Do not skip ahead:
    - `lot.py`: `ParkingLot` accepts `pricing_strategy` in constructor, delegates fee calculation to strategy
    - `tests/test_pricing.py`: flat rate, hourly rounding up, peak/off-peak rates — all with fixed timestamps
    - `tests/test_lot.py`: updated to pass pricing strategy to `ParkingLot`
-3. Refactor spot behavior into the State pattern.
-4. Add the Factory for vehicle and spot creation.
-5. Add the availability query and the demo in `main.py`.
-6. Write the README and diagram.
+3. [DONE] Refactor spot behavior into the State pattern.
+   - `park()` and `unpark()` now delegate to `SpotState.can_park()` / `can_unpark()` and raise `SpotOutOfServiceError` when rejected.
+   - `tests/test_states.py`: state unit tests + out-of-service unpark test.
+4. [DONE] Add the Factory for vehicle and spot creation.
+   - `factory.py`: `VehicleFactory`, `SpotFactory`, plus `UnknownVehicleTypeError` / `UnknownSpotTypeError`.
+   - `add_spot` stays enum-based; factories are standalone for callers building from type strings.
+   - `tests/test_factory.py`: happy path + unknown-type error path for each factory.
+5. [DONE] Add the availability query and the demo in `main.py`.
+   - `ParkingLot.free_spot_counts()` returns `{spot_type: count}` for free spots only.
+   - `main.py` demo parks/unparks several vehicles and prints fees.
+6. [DONE] Write the README and diagram.
 
 After each step, run tests and summarize what changed in one short paragraph.
 
@@ -157,6 +164,9 @@ Record the decision here when made. Until then, the agent should ask before assu
 - Fee (step 1): flat $5.0 placeholder; replaced by Strategy pattern in step 2.
 - Out-of-service spots: settable only in tests (no public method yet).
 - Spot id prefix: `S` + number (e.g., `S1`, `S2`). Ticket id prefix: `T` + number.
+- Step 3 approach: minimal wiring — `park()`/`unpark()` check `can_park()`/`can_unpark()` on the state object; no public `set_out_of_service` method.
+- Step 4: factories are enum-based and standalone; `add_spot` keeps taking `SpotType` enums (no API change).
+- Step 5: `free_spot_counts()` counts only spots where `state.can_park()` is true; demo uses injectable clock via `ParkingLot(clock=...)`.
 
 ### Still open
 (None — all step 2 decisions recorded above.)

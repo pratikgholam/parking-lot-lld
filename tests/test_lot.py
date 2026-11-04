@@ -49,3 +49,18 @@ def test_double_unpark_raises() -> None:
     lot.unpark(ticket.id)
     with pytest.raises(TicketNotFoundError):
         lot.unpark(ticket.id)
+
+
+def test_free_spot_counts() -> None:
+    lot = _make_lot()
+    assert lot.free_spot_counts() == {
+        SpotType.SMALL: 2,
+        SpotType.MEDIUM: 2,
+        SpotType.LARGE: 2,
+    }
+    vehicle = Vehicle("ABC-123", VehicleType.CAR)
+    lot.park(vehicle)
+    counts = lot.free_spot_counts()
+    assert counts[SpotType.MEDIUM] == 1
+    assert counts[SpotType.SMALL] == 2
+    assert counts[SpotType.LARGE] == 2
